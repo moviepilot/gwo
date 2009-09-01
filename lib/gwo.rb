@@ -31,7 +31,7 @@ module GWO
       '.google-analytics.com/ga.js"></sc'+'ript>')</script>
       <script type="text/javascript">
       try {
-      var pageTracker=_gat._getTracker("#{uacct.inspect}");
+      var pageTracker=_gat._getTracker("#{uacct}");
       pageTracker._trackPageview("/#{id}/test");
       }catch(err){}</script>
     }
@@ -46,7 +46,7 @@ module GWO
       '.google-analytics.com/ga.js"></sc'+'ript>')</script>
       <script type="text/javascript">
       try {
-      var pageTracker=_gat._getTracker("#{uacct.inspect}");
+      var pageTracker=_gat._getTracker("#{uacct}");
       pageTracker._trackPageview("/#{id}/goal");
       }catch(err){}</script>
       }
