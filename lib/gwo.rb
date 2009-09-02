@@ -4,9 +4,15 @@ module GWO
 
     include ::ActionView::Helpers::CaptureHelper
     
+    def js_logger(text, with_js_tag = false)
+      return "if(typeof(console.log) == 'function') console.log(#{text})" if RAILS_ENV != "test" && !with_js_tag
+      return "<script type='text/javascript'>if(typeof(console.log) == 'function') console.log(\"#{text}\")</script>" if RAILS_ENV != "test" && with_js_tag
+      return ""
+    end
 
     def gwo_start(id, sections  = [], ignore=false)
-      return "" if ignore
+      return js_logger("skipping start snippet: a/b variation test switched off", true) if ignore 
+
 
       sections = [*sections].compact.empty? ? ["gwo_section"] : [*sections]
       src = %{
@@ -25,13 +31,22 @@ module GWO
 
       sections.each do |section|
         src += "<!-- utmx section name='#{section}' -->"
+        src += %{
+          <script type="text/javascript"><!--
+            var GWO_#{section} = utmx("variation_content", "#{section}");
+            #{ js_logger("'variant: ' + (GWO_#{section} == undefined ? 'default variant' : GWO_#{section})") }
+            if(typeof(trackPageView) == 'function') trackPageView(document.location + "?ab_test_variant=" + (GWO_#{section} == undefined ? 'default_variant' : GWO_#{section}));
+          //-->
+          </script>
+        }
       end
 
       src
     end
-
+    
     def gwo_end(id, uacct, ignore = false)
-      return "" if ignore
+      return js_logger("skipping end snippet: a/b variation test switched off", true) if ignore 
+
       %{<script type="text/javascript">
       if(typeof(_gat)!='object')document.write('<sc'+'ript src="http'+
       (document.location.protocol=='https:'?'s://ssl':'://www')+
@@ -46,7 +61,8 @@ module GWO
     end
 
     def gwo_conversion(id, uacct, ignore = false)  
-      return "" if ignore
+      return js_logger("skipping conversion snippet: a/b variation test switched off", true) if ignore 
+
       %{
       <script type="text/javascript">
       if(typeof(_gat)!='object')document.write('<sc'+'ript src="http'+
@@ -71,7 +87,6 @@ module GWO
           src += capture(&block)
         else
           src += %{ <script>
-          var GWO_#{section} = utmx("variation_content", "#{section}");
           if ( #{ (variation_numbers.map{|x| "GWO_#{section} != \"#{x}\""} + ["GWO_#{section} != undefined"]).join(" && ")} ) document.write('<no' + 'script>');
           </script>
             #{capture(&block) if block_given?}
@@ -87,6 +102,8 @@ module GWO
           <script>document.write('<'+'!'+'-'+'-')</script>-->
           }
         end
+      else
+        src =  js_logger("skipping snippet for #{variation_numbers.join(", ")} variations: a/b variation test switched off", true) 
       end
       src
     end

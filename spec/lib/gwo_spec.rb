@@ -7,17 +7,20 @@ describe GWO do
   describe "gwo_start method" do
     it "should produce correct output" do
       gwo_start("gwo_id", "section_name").should =~ /utmx section name='section_name'/
+      gwo_start("gwo_id", "section_name").should =~ /utmx\(\"variation_content\", \"section_name\"\)/
       gwo_start("gwo_id", "section_name").should =~ /k='gwo_id'/
     end
 
     it "should work with just the id parameter set" do
       gwo_start("gwo_id").should =~ /k='gwo_id'/
       gwo_start("gwo_id").should =~ /utmx section name='gwo_section'/
+      gwo_start("gwo_id").should =~ /utmx\(\"variation_content\", \"gwo_section\"\)/
       gwo_start("gwo_id", nil).should =~ /utmx section name='gwo_section'/
     end
 
     it "should work with one single section ... section is a symbol" do
       gwo_start("gwo_id", :section_name).should =~ /utmx section name='section_name'/
+      gwo_start("gwo_id", :section_name).should =~ /utmx\(\"variation_content\", \"section_name\"\)/
       gwo_start("gwo_id", :section_name).should =~ /k='gwo_id'/
     end
 
@@ -25,11 +28,17 @@ describe GWO do
       gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx section name='body'/
       gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx section name='content'/
       gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx section name='footer'/
+      gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx\(\"variation_content\", \"body\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx\(\"variation_content\", \"content\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx\(\"variation_content\", \"footer\"\)/
     end
 
     it "should return nothing when ignore is set to true" do
       gwo_start("id", [], true).should == "" 
       gwo_start("gwo_id", ["body",:content,"footer"], true).should == ""
+      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_content\", \"body\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_content\", \"content\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_content\", \"footer\"\)/
     end
   end
 
@@ -68,13 +77,11 @@ describe GWO do
 
     it "should return default output with javascript if ignore is unset and default is the variation " do
       gwo_section("gwo_section", :default) { "this is the content" }.should =~ /this is the content/
-      gwo_section("gwo_section", :default) { "this is the content" }.should =~ /utmx\(\"variation_content\", \"gwo_section\"\)/
       gwo_section("gwo_section", :default) { "this is the content" }.should =~ /( GWO_gwo_section != undefined )/
     end
 
     it "should only write one javascript block if the section is used for default and variations" do
       gwo_section("section", [:default, :variation1, :variation2]) { "this is the content" }.should     =~ /this is the content/
-      gwo_section("section", [:default, :variation1, :variation2]) { "this is the content" }.should     =~ /utmx\(\"variation_content\", \"section\"\)/
       gwo_section("section", [:default, :variation1, :variation2]) { "this is the content" }.should     =~ /( GWO_section != \"variation1\" && GWO_section != \"variation2\" && GWO_section != undefined )/
     end
 

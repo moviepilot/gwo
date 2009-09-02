@@ -3,3 +3,4 @@
 require 'rake'
 require 'rake/testtask'
 require 'spec' 
+RAILS_ENV="test"
