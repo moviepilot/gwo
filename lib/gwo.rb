@@ -65,6 +65,7 @@ module GWO
 
       %{
       <script type="text/javascript">
+      #{ js_logger("'conversion for test with id #{id} and uacct #{uacct}'") }
       if(typeof(_gat)!='object')document.write('<sc'+'ript src="http'+
       (document.location.protocol=='https:'?'s://ssl':'://www')+
       '.google-analytics.com/ga.js"></sc'+'ript>')</script>
