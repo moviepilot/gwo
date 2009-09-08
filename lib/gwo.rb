@@ -5,7 +5,7 @@ module GWO
     include ::ActionView::Helpers::CaptureHelper
     
     def js_logger(text, with_js_tag = false)
-      return "if(typeof(console.log) == 'function') console.log(#{text})" if RAILS_ENV != "test" && !with_js_tag
+      return "if(typeof(console.log) == 'function') console.log(#{text})" if RAILS_ENV != "test" && RAILS_ENV != "development" && !with_js_tag
       return "<script type='text/javascript'>if(typeof(console.log) == 'function') console.log(\"#{text}\")</script>" if RAILS_ENV != "test" && with_js_tag
       return ""
     end
@@ -65,6 +65,7 @@ module GWO
 
       %{
       <script type="text/javascript">
+      #{ js_logger("'conversion for test with id #{id} and uacct #{uacct}'") }
       if(typeof(_gat)!='object')document.write('<sc'+'ript src="http'+
       (document.location.protocol=='https:'?'s://ssl':'://www')+
       '.google-analytics.com/ga.js"></sc'+'ript>')</script>
