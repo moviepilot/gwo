@@ -10,6 +10,13 @@ module GWO
       return ""
     end
 
+    def gwo_experiment(id, uacct, sections = [], ignore = false, &block)
+      src  = gwo_start(id, sections, ignore)
+      src += capture(&block) 
+      src += gwo_end(id, uacct, ignore)
+      src
+    end
+
     def gwo_start(id, sections  = [], ignore=false)
       return js_logger("skipping start snippet: a/b variation test switched off", true) if ignore 
 
