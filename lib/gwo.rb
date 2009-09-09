@@ -23,7 +23,7 @@ module GWO
 
       sections = [*sections].compact.empty? ? ["gwo_section"] : [*sections]
       src = %{
-        <script type="text/javascript">
+        <script type='text/javascript'>
         function utmx_section(){}function utmx(){}
         (function(){var k='#{id}',d=document,l=d.location,c=d.cookie;function f(n){
         if(c){var i=c.indexOf(n+'=');if(i>-1){var j=c.indexOf(';',i);return c.substring(i+n.
@@ -36,19 +36,32 @@ module GWO
         </script>
       }
 
+      google_analytics_info = "";
+      section_definitions = "";
+      variable_assignments = "";
+
       sections.each do |section|
-        src += "<!-- utmx section name='#{section}' -->"
-        src += %{
-          <script type="text/javascript"><!--
+        section_definitions += "<!-- utmx section name='#{section}' -->\n"
+
+        variable_assignments += %{
             var GWO_#{section} = utmx("variation_content", "#{section}");
-            #{ js_logger("'variant: ' + (GWO_#{section} == undefined ? 'default variant' : GWO_#{section})") }
-            if(typeof(trackPageView) == 'function') trackPageView(document.location + "?ab_test_variant=" + (GWO_#{section} == undefined ? 'default_variant' : GWO_#{section}));
-          //-->
-          </script>
+            #{ js_logger("'variant: ' + (GWO_#{section} == undefined ? 'original' : GWO_#{section})") }
         }
+        google_analytics_info += "google_analytics_info += \"|GWO_#{section}:\" + (GWO_#{section} == undefined ? 'original' : GWO_#{section});"
       end
 
-      src
+      variable_assignments += %{
+         window.onload = function(){ 
+          var google_analytics_info = ''; #{google_analytics_info}; if(typeof(trackPageView) == 'function') {
+            trackPageView(document.location + "?ab_test_variant=" + google_analytics_info);
+            #{js_logger('document.location + "?ab_test_variant=" + google_analytics_info')}
+          }
+        }
+      }
+
+      variable_assignments = "<script type='text/javascript'>#{variable_assignments}</script>";
+
+      "#{src}#{section_definitions}#{variable_assignments}"
     end
     
     def gwo_end(id, uacct, ignore = false)
