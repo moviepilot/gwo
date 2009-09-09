@@ -5,8 +5,8 @@ module GWO
     include ::ActionView::Helpers::CaptureHelper
     
     def js_logger(text, with_js_tag = false)
-      return "if(typeof(console.log) == 'function') console.log(#{text})" if RAILS_ENV != "test" && RAILS_ENV != "development" && !with_js_tag
-      return "<script type='text/javascript'>if(typeof(console.log) == 'function') console.log(\"#{text}\")</script>" if RAILS_ENV != "test" && with_js_tag
+      return "if(typeof(console.log) == 'function') console.log(#{text});" if RAILS_ENV != "test" && RAILS_ENV != "production" && !with_js_tag
+      return "<script type='text/javascript'>if(typeof(console.log) == 'function') console.log(\"#{text}\");</script>" if RAILS_ENV != "test" && RAILS_ENV != "production" && with_js_tag
       return ""
     end
 
