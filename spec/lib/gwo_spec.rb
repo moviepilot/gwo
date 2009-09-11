@@ -21,7 +21,7 @@ describe GWO do
 
     it "should create correct google analytics stuff for static urls" do
       gwo_start("gwo_id", "section_name", :ga_tracking => true, :ga_base_url => "http://example.com").should =~ /google_analytics_info \+= \"&GWO_section_name_name=\" \+ GWO_section_name_name;/
-      gwo_start("gwo_id", "section_name", :ga_tracking => true, :ga_base_url => "http://example.com").should =~ /trackPageView\(http:\/\/example\.com \+ \"\?ab_test=true\" \+ google_analytics_info\)/
+      gwo_start("gwo_id", "section_name", :ga_tracking => true, :ga_base_url => "http://example.com").should =~ /trackPageView\(\"http:\/\/example\.com\" \+ \"\?ab_test=true\" \+ google_analytics_info\)/
     end
 
     it "should create correct google analytics stuff for several sections" do

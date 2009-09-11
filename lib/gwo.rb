@@ -1,3 +1,9 @@
+# Author::    Alex MacCaw - alex AT madebymany DOT co DOT uk (original), Daniel Bornkessel - daniel AT bornkessel DOT com
+# License::   MIT
+# :include:README.markdown
+#
+#
+
 require 'action_view/helpers/capture_helper'
 module GWO
   module Helper
@@ -112,27 +118,27 @@ module GWO
       sections.each do |section|
         section_definitions += "<!-- utmx section name='#{section}' -->\n"
 
-        variable_assignments += %{
-            var GWO_#{section}_name = utmx("variation_content", "#{section}");
-            if( GWO_#{section}_name == undefined) GWO_#{section}_name = 'original';
-
-            var GWO_#{section}_number = utmx("variation_number", "#{section}");
-            if( GWO_#{section}_number == undefined) GWO_#{section}_number = 0;
-
-            #{ js_logger("'variant: ' + GWO_#{section}_name") }
+        variable_assignments += %{\
+            var GWO_#{section}_name = utmx("variation_content", "#{section}");\
+            if( GWO_#{section}_name == undefined) GWO_#{section}_name = 'original';\
+\
+            var GWO_#{section}_number = utmx("variation_number", "#{section}");\
+            if( GWO_#{section}_number == undefined) GWO_#{section}_number = 0;\
+\
+            #{ js_logger("'variant: ' + GWO_#{section}_name") }\
         }
         google_analytics_info += "google_analytics_info += \"&GWO_#{section}_name=\" + GWO_#{section}_name;" if options[:ga_tracking]
       end
 
       if options[:ga_tracking]
-        base_url = options[:ga_base_url] || "document.location"
-        variable_assignments += %{
-           window.onload = function(){ 
-            var google_analytics_info = ''; #{google_analytics_info}; if(typeof(trackPageView) == 'function') {
-              trackPageView(#{base_url} + "?ab_test=true" + google_analytics_info);
-              #{js_logger("#{base_url} + \"?ab_test=true\" + google_analytics_info")}
-            }
-          }
+        base_url = options[:ga_base_url] ? "\"#{options[:ga_base_url]}\"" : "document.location"
+        variable_assignments += %{\
+           window.onload = function(){ \
+            var google_analytics_info = ''; #{google_analytics_info}; if(typeof(trackPageView) == 'function') {\
+              trackPageView(#{base_url} + "?ab_test=true" + google_analytics_info);\
+              #{js_logger("#{base_url} + \"?ab_test=true\" + google_analytics_info")}\
+            }\
+          }\
         }
       end
 
