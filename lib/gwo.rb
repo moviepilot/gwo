@@ -44,7 +44,8 @@ module GWO
         section_definitions += "<!-- utmx section name='#{section}' -->\n"
 
         variable_assignments += %{
-            var GWO_#{section} = utmx("variation_content", "#{section}") || "original";
+            var GWO_#{section} = utmx("variation_content", "#{section}");
+            if( GWO_#{section} == undefined) GWO_#{section} = 'original';
             #{ js_logger("'variant: ' + GWO_#{section}") }
         }
         google_analytics_info += "google_analytics_info += \"|GWO_#{section}:\" + GWO_#{section};"
