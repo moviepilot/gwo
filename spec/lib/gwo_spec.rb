@@ -67,22 +67,22 @@ describe GWO do
 
   describe "gwo_section method" do
       
-    it "should return nothing when ignore is set to true and the variation is not the default" do
+    it "should return nothing when ignore is set to true and the variation is not the original" do
       gwo_section("gwo_section", ["foo","bar"], true).should == ""
     end
 
-    it "should return default output without javascript if ignore is true and default is the variation " do
-      gwo_section("gwo_section", :default, true) { "this is the content" }.should == "this is the content"
+    it "should return original output without javascript if ignore is true and original is the variation " do
+      gwo_section("gwo_section", :original, true) { "this is the content" }.should == "this is the content"
     end
 
-    it "should return default output with javascript if ignore is unset and default is the variation " do
-      gwo_section("gwo_section", :default) { "this is the content" }.should =~ /this is the content/
-      gwo_section("gwo_section", :default) { "this is the content" }.should =~ /( GWO_gwo_section != undefined )/
+    it "should return original output with javascript if ignore is unset and original is the variation " do
+      gwo_section("gwo_section", :original) { "this is the content" }.should =~ /this is the content/
+      gwo_section("gwo_section", :original) { "this is the content" }.should =~ /( GWO_gwo_section != undefined )/
     end
 
-    it "should only write one javascript block if the section is used for default and variations" do
-      gwo_section("section", [:default, :variation1, :variation2]) { "this is the content" }.should     =~ /this is the content/
-      gwo_section("section", [:default, :variation1, :variation2]) { "this is the content" }.should     =~ /( GWO_section != \"variation1\" && GWO_section != \"variation2\" && GWO_section != undefined )/
+    it "should only write one javascript block if the section is used for original and variations" do
+      gwo_section("section", [:original, :variation1, :variation2]) { "this is the content" }.should     =~ /this is the content/
+      gwo_section("section", [:original, :variation1, :variation2]) { "this is the content" }.should     =~ /( GWO_section != \"variation1\" && GWO_section != \"variation2\" && GWO_section != undefined )/
     end
 
     it "should write block for one variant" do

@@ -102,8 +102,8 @@ module GWO
     def gwo_section(section = "gwo_section", variation_numbers = nil, ignore = false, &block)
       variation_numbers = [*variation_numbers].compact
       src = ""
-      if variation_numbers.include?(:default) || variation_numbers.empty?
-        variation_numbers.delete(:default)
+      if variation_numbers.include?(:original) || variation_numbers.empty?
+        variation_numbers.delete(:original)
         if ignore
           src += capture(&block)
         else
