@@ -77,12 +77,12 @@ describe GWO do
 
     it "should return original output with javascript if ignore is unset and original is the variation " do
       gwo_section("gwo_section", :original) { "this is the content" }.should =~ /this is the content/
-      gwo_section("gwo_section", :original) { "this is the content" }.should =~ /( GWO_gwo_section != undefined )/
+      gwo_section("gwo_section", :original) { "this is the content" }.should =~ /( GWO_gwo_section != \"original\" )/
     end
 
     it "should only write one javascript block if the section is used for original and variations" do
       gwo_section("section", [:original, :variation1, :variation2]) { "this is the content" }.should     =~ /this is the content/
-      gwo_section("section", [:original, :variation1, :variation2]) { "this is the content" }.should     =~ /( GWO_section != \"variation1\" && GWO_section != \"variation2\" && GWO_section != undefined )/
+      gwo_section("section", [:original, :variation1, :variation2]) { "this is the content" }.should     =~ /( GWO_section != \"original\" && GWO_section != \"variation1\" && GWO_section != \"variation2\" )/
     end
 
     it "should write block for one variant" do

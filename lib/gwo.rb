@@ -44,10 +44,10 @@ module GWO
         section_definitions += "<!-- utmx section name='#{section}' -->\n"
 
         variable_assignments += %{
-            var GWO_#{section} = utmx("variation_content", "#{section}");
-            #{ js_logger("'variant: ' + (GWO_#{section} == undefined ? 'original' : GWO_#{section})") }
+            var GWO_#{section} = utmx("variation_content", "#{section}") || "original";
+            #{ js_logger("'variant: ' + GWO_#{section}") }
         }
-        google_analytics_info += "google_analytics_info += \"|GWO_#{section}:\" + (GWO_#{section} == undefined ? 'original' : GWO_#{section});"
+        google_analytics_info += "google_analytics_info += \"|GWO_#{section}:\" + GWO_#{section};"
       end
 
       variable_assignments += %{
@@ -103,12 +103,11 @@ module GWO
       variation_numbers = [*variation_numbers].compact
       src = ""
       if variation_numbers.include?(:original) || variation_numbers.empty?
-        variation_numbers.delete(:original)
         if ignore
           src += capture(&block)
         else
           src += %{ <script>
-          if ( #{ (variation_numbers.map{|x| "GWO_#{section} != \"#{x}\""} + ["GWO_#{section} != undefined"]).join(" && ")} ) document.write('<no' + 'script>');
+          if ( #{ variation_numbers.map{|x| "GWO_#{section} != \"#{x}\""}.join(" && ") } ) document.write('<no' + 'script>');
           </script>
             #{capture(&block) if block_given?}
           </noscript>
