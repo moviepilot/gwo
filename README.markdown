@@ -1,6 +1,6 @@
 This is a Ruby on Rails plugin (gem) which simplifies Server-Side Dynamic Section Variations with 
-[Google Website Optimizer](http://www.google.com/websiteoptimizer) as described on 
-http://www.gwotricks.com/2009/05/server-side-dynamic-section-variations.html
+[Google Website Optimizer](http://www.google.com/websiteoptimizer) as described on in the article
+[Server-Side Dynamic Section Variations on gwotricks.com](http://www.gwotricks.com/2009/05/server-side-dynamic-section-variations.html)
 
 == Features: 
 
@@ -17,8 +17,8 @@ The 'Usage' may look long - but it's fairly straightforward and shouldn't take 5
 
 Daniel Bornkessel gwo@bornkessel.com & Alex MacCaw - alex@madebymany.co.uk (original author)
 
-Usage
-=====
+== Usage
+=======
 
 To use GWO, you need two pages:
 * A test page containing the AB sections
