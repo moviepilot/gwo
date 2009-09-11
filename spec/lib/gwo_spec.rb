@@ -79,29 +79,29 @@ describe GWO do
       gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx\(\"variation_number\", \"footer\"\)/
     end
 
-    it "should return nothing when ignore is set to true" do
-      gwo_start("id", [], true).should == "" 
-      gwo_start("gwo_id", ["body",:content,"footer"], true).should == ""
+    it "should return nothing when conditions return false" do
+      gwo_start("id", [], {:conditions => false}).should == "" 
+      gwo_start("gwo_id", ["body",:content,"footer"], :conditions => false).should == ""
 
-      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_content\", \"body\"\)/
-      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_content\", \"content\"\)/
-      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_content\", \"footer\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"], {:conditions => false}).should_not =~ /utmx\(\"variation_content\", \"body\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"], {:conditions => false}).should_not =~ /utmx\(\"variation_content\", \"content\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"], {:conditions => false}).should_not =~ /utmx\(\"variation_content\", \"footer\"\)/
       
-      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_number\",  \"body\"\)/
-      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_number\",  \"content\"\)/
-      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_number\",  \"footer\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"], :conditions => false).should_not =~ /utmx\(\"variation_number\",  \"body\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"], :conditions => false).should_not =~ /utmx\(\"variation_number\",  \"content\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"], :conditions => false).should_not =~ /utmx\(\"variation_number\",  \"footer\"\)/
     end
   end
 
   describe "gwo_end method" do
     it "should produce correct output" do
-      gwo_end("gwo_id", "gwo_uacct").should =~ /getTracker\(\"gwo_uacct\"\)/
-      gwo_end("gwo_id", "gwo_uacct").should =~ /trackPageview\(\"\/gwo_id\/test\"\)/
+      gwo_end("gwo_id", "gwo_uacct", :conditions => true).should =~ /getTracker\(\"gwo_uacct\"\)/
+      gwo_end("gwo_id", "gwo_uacct", :conditions => true).should =~ /trackPageview\(\"\/gwo_id\/test\"\)/
     end
 
-    it "should return nothing if ignore is set to true" do
-      gwo_end("gwo_id", "gwo_uacct", true).should_not =~ /getTracker\(\"gwo_uacct\"\)/
-      gwo_end("gwo_id", "gwo_uacct", true).should == ""
+    it "should return nothing if conditions are not met" do
+      gwo_end("gwo_id", "gwo_uacct", {:conditions => false}).should_not =~ /getTracker\(\"gwo_uacct\"\)/
+      gwo_end("gwo_id", "gwo_uacct", :conditions => false).should == ""
     end
   end
 
@@ -111,19 +111,19 @@ describe GWO do
       gwo_conversion("gwo_id", "gwo_uacct").should =~ /trackPageview\(\"\/gwo_id\/goal\"\)/
     end
 
-    it "should return nothing when ignore is set to true" do
-      gwo_conversion("gwo_id", "gwo_uacct", true).should == ""
+    it "should return nothing when conditions are not met" do
+      gwo_conversion("gwo_id", "gwo_uacct", {:conditions => false}).should == ""
     end
   end
 
   describe "gwo_section method with named sections" do
       
-    it "should return nothing when ignore is set to true and the variation is not the original" do
-      gwo_section("gwo_section", ["foo","bar"], true).should == ""
+    it "should return nothing when conditions are not met and the variation is not the original" do
+      gwo_section("gwo_section", ["foo","bar"], {:conditions => false}).should == ""
     end
 
-    it "should return original output without javascript if ignore is true and original is the variation " do
-      gwo_section("gwo_section", :original, true) { "this is the content" }.should == "this is the content"
+    it "should return original output without javascript if conditions are not met and original is the variation " do
+      gwo_section("gwo_section", :original, {:conditions => false}) { "this is the content" }.should == "this is the content"
     end
 
     it "should return original output with javascript if ignore is unset and original is the variation " do
@@ -149,12 +149,12 @@ describe GWO do
 
   describe "gwo_section method with numbered sections" do
       
-    it "should return nothing when ignore is set to true and the variation is not the original" do
-      gwo_section("gwo_section", [1, 2], true).should == ""
+    it "should return nothing when conditions are not met and the variation is not the original" do
+      gwo_section("gwo_section", [1, 2], {:conditions => false}).should == ""
     end
 
-    it "should return original output without javascript if ignore is true and original is the variation " do
-      gwo_section("gwo_section", 0, true) { "this is the content" }.should == "this is the content"
+    it "should return original output without javascript if conditions are not met and original is the variation " do
+      gwo_section("gwo_section", 0, {:conditions => false}) { "this is the content" }.should == "this is the content"
     end
 
     it "should return original output with javascript if ignore is unset and original is the variation " do

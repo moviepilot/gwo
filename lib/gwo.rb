@@ -10,16 +10,24 @@ module GWO
       return ""
     end
 
-    def gwo_experiment(id, uacct, sections = [], ignore = false, &block)
-      src  = gwo_start(id, sections, ignore)
+    def gwo_experiment(id, uacct, sections = [], options = {}, &block)
+      options = {
+        :conditions => true
+      }.update(options)
+
+      src  = gwo_start(id, sections, options)
       src += capture(&block) 
-      src += gwo_end(id, uacct, ignore)
+      src += gwo_end(id, uacct, options)
       src
     end
 
 
-    def gwo_conversion(id, uacct, ignore = false)  
-      return js_logger("skipping conversion snippet: a/b variation test switched off", true) if ignore 
+    def gwo_conversion(id, uacct, options = {})  
+      options = {
+        :conditions => true
+      }.update(options)
+
+      return js_logger("skipping conversion snippet: a/b variation test switched off", true) if options[:conditions] == false
 
       %{
       <script type="text/javascript">
@@ -37,11 +45,15 @@ module GWO
     end
 
 
-    def gwo_section(section = "gwo_section", variation_ids = nil, ignore = false, &block)
+    def gwo_section(section = "gwo_section", variation_ids = nil, options = {}, &block)
+      options = {
+        :conditions => true
+      }.update(options)
+
       variation_ids = [*variation_ids].compact
       src = ""
       if is_default_section?(variation_ids)
-        if ignore
+        if options[:conditions] == false
           src += capture(&block)
         else
           conditions = (named_variations?(variation_ids) ? variation_ids.map{|x| "GWO_#{section}_name != \"#{x}\""} : variation_ids.map{|x| "GWO_#{section}_number != #{x}"}).join(" && ")
@@ -53,7 +65,7 @@ module GWO
           </noscript>
           }
         end
-      elsif not ignore
+      elsif options[:conditions] == true
         if !variation_ids.empty?
           conditions = (named_variations?(variation_ids) ? variation_ids.map{|x| "GWO_#{section}_name == \"#{x}\""} : variation_ids.map{|x| "GWO_#{section}_number == #{x}"}).join(" || ") 
              
@@ -71,8 +83,9 @@ module GWO
     end
 
     private
-    def gwo_start(id, sections  = [], ignore=false)
-      return js_logger("skipping start snippet: a/b variation test switched off", true) if ignore 
+    def gwo_start(id, sections  = [], options = {})
+
+      return js_logger("skipping start snippet: a/b variation test switched off", true) if options[:conditions] == false
 
 
       sections = [*sections].compact.empty? ? ["gwo_section"] : [*sections]
@@ -90,7 +103,7 @@ module GWO
         </script>
       }
 
-      google_analytics_info = "";
+      google_analytics_info = "?";
       section_definitions = "";
       variable_assignments = "";
 
@@ -106,7 +119,7 @@ module GWO
 
             #{ js_logger("'variant: ' + GWO_#{section}_name") }
         }
-        google_analytics_info += "google_analytics_info += \"|GWO_#{section}_name:\" + GWO_#{section}_name;"
+        google_analytics_info += "google_analytics_info += \"&GWO_#{section}_name=\" + GWO_#{section}_name;"
       end
 
       variable_assignments += %{
@@ -123,8 +136,8 @@ module GWO
       "#{src}#{section_definitions}#{variable_assignments}"
     end
     
-    def gwo_end(id, uacct, ignore = false)
-      return js_logger("skipping end snippet: a/b variation test switched off", true) if ignore 
+    def gwo_end(id, uacct, options)
+      return js_logger("skipping end snippet: a/b variation test switched off", true) if options[:conditions] == false
 
       %{<script type="text/javascript">
       if(typeof(_gat)!='object')document.write('<sc'+'ript src="http'+
