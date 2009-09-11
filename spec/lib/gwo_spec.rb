@@ -5,10 +5,32 @@ describe GWO do
   include GWO::Helper
 
   describe "google analytics stuff" do
-    it "should create correct google analytics stuff for default urls"
-    it "should create correct google analytics stuff for static urls"
-    it "should create correct google analytics stuff for several sections"
-    it "should not create google analytics stuff if option is disabled"
+    it "should not create any google analytics stuff by default" do
+      gwo_start("gwo_id", "section_name").should_not =~ /google_analytics_info \+= \"&GWO_section_name_name=\" \+ GWO_section_name_name;/
+      gwo_start("gwo_id", "section_name").should_not =~ /trackPageView\(document.location \+ \"\?ab_test=true\" \+ google_analytics_info\)/
+    end
+    it "should not create google analytics stuff if option is disabled" do
+      gwo_start("gwo_id", "section_name", :ga_tracking => false).should_not =~ /google_analytics_info \+= \"&GWO_section_name_name=\" \+ GWO_section_name_name;/
+      gwo_start("gwo_id", "section_name", :ga_tracking => false).should_not =~ /trackPageView\(document.location \+ \"\?ab_test=true\" \+ google_analytics_info\)/
+    end
+
+    it "should create correct google analytics stuff for default urls" do
+      gwo_start("gwo_id", "section_name", :ga_tracking => true).should =~ /google_analytics_info \+= \"&GWO_section_name_name=\" \+ GWO_section_name_name;/
+      gwo_start("gwo_id", "section_name", :ga_tracking => true).should =~ /trackPageView\(document.location \+ \"\?ab_test=true\" \+ google_analytics_info\)/
+    end
+
+    it "should create correct google analytics stuff for static urls" do
+      gwo_start("gwo_id", "section_name", :ga_tracking => true, :ga_base_url => "http://example.com").should =~ /google_analytics_info \+= \"&GWO_section_name_name=\" \+ GWO_section_name_name;/
+      gwo_start("gwo_id", "section_name", :ga_tracking => true, :ga_base_url => "http://example.com").should =~ /trackPageView\(http:\/\/example\.com \+ \"\?ab_test=true\" \+ google_analytics_info\)/
+    end
+
+    it "should create correct google analytics stuff for several sections" do
+      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :ga_tracking => true).should =~ /google_analytics_info \+= \"&GWO_section_name1_name=\" \+ GWO_section_name1_name;/
+      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :ga_tracking => true).should =~ /google_analytics_info \+= \"&GWO_section_name2_name=\" \+ GWO_section_name2_name;/
+      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :ga_tracking => true).should =~ /google_analytics_info \+= \"&GWO_section_name3_name=\" \+ GWO_section_name3_name;/
+      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :ga_tracking => true).should =~ /trackPageView\(document.location \+ \"\?ab_test=true\" \+ google_analytics_info\)/
+    end
+
   end
 
   describe "named_variations? method" do

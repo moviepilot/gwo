@@ -12,7 +12,9 @@ module GWO
 
     def gwo_experiment(id, uacct, sections = [], options = {}, &block)
       options = {
-        :conditions => true
+        :conditions => true,
+        :ga_tracking => false,
+        :ga_base_url => nil
       }.update(options)
 
       src  = gwo_start(id, sections, options)
@@ -103,7 +105,7 @@ module GWO
         </script>
       }
 
-      google_analytics_info = "?";
+      google_analytics_info = "";
       section_definitions = "";
       variable_assignments = "";
 
@@ -119,17 +121,20 @@ module GWO
 
             #{ js_logger("'variant: ' + GWO_#{section}_name") }
         }
-        google_analytics_info += "google_analytics_info += \"&GWO_#{section}_name=\" + GWO_#{section}_name;"
+        google_analytics_info += "google_analytics_info += \"&GWO_#{section}_name=\" + GWO_#{section}_name;" if options[:ga_tracking]
       end
 
-      variable_assignments += %{
-         window.onload = function(){ 
-          var google_analytics_info = ''; #{google_analytics_info}; if(typeof(trackPageView) == 'function') {
-            trackPageView(document.location + "?ab_test_variant=" + google_analytics_info);
-            #{js_logger('document.location + "?ab_test_variant=" + google_analytics_info')}
+      if options[:ga_tracking]
+        base_url = options[:ga_base_url] || "document.location"
+        variable_assignments += %{
+           window.onload = function(){ 
+            var google_analytics_info = ''; #{google_analytics_info}; if(typeof(trackPageView) == 'function') {
+              trackPageView(#{base_url} + "?ab_test=true" + google_analytics_info);
+              #{js_logger("#{base_url} + \"?ab_test=true\" + google_analytics_info")}
+            }
           }
         }
-      }
+      end
 
       variable_assignments = "<script type='text/javascript'>#{variable_assignments}</script>";
 
