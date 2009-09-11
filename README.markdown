@@ -1,5 +1,5 @@
 This is a Ruby on Rails plugin (gem) which simplifies Server-Side Dynamic Section Variations with 
-Google Website Optimizer [http://www.google.com/websiteoptimizer] as described on 
+[Google Website Optimizer](http://www.google.com/websiteoptimizer) as described on 
 http://www.gwotricks.com/2009/05/server-side-dynamic-section-variations.html
 
 == Features: 
