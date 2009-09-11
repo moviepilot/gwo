@@ -44,11 +44,12 @@ module GWO
         section_definitions += "<!-- utmx section name='#{section}' -->\n"
 
         variable_assignments += %{
-            var GWO_#{section} = utmx("variation_content", "#{section}");
-            if( GWO_#{section} == undefined) GWO_#{section} = 'original';
-            #{ js_logger("'variant: ' + GWO_#{section}") }
+            var GWO_#{section}_name = utmx("variation_content", "#{section}");
+            if( GWO_#{section}_name == undefined) GWO_#{section}_name = 'original';
+
+            #{ js_logger("'variant: ' + GWO_#{section}_name") }
         }
-        google_analytics_info += "google_analytics_info += \"|GWO_#{section}:\" + GWO_#{section};"
+        google_analytics_info += "google_analytics_info += \"|GWO_#{section}_name:\" + GWO_#{section}_name;"
       end
 
       variable_assignments += %{
@@ -108,7 +109,7 @@ module GWO
           src += capture(&block)
         else
           src += %{ <script>
-          if ( #{ variation_numbers.map{|x| "GWO_#{section} != \"#{x}\""}.join(" && ") } ) document.write('<no' + 'script>');
+          if ( #{ variation_numbers.map{|x| "GWO_#{section}_name != \"#{x}\""}.join(" && ") } ) document.write('<no' + 'script>');
           </script>
             #{capture(&block) if block_given?}
           </noscript>
@@ -117,7 +118,7 @@ module GWO
       elsif not ignore
         if !variation_numbers.empty?
           src += %{<script>
-          if ( #{variation_numbers.map{|x| "GWO_#{section} == \"#{x}\""}.join(" || ")} ) document.write('</noscript a="');
+          if ( #{variation_numbers.map{|x| "GWO_#{section}_name == \"#{x}\""}.join(" || ")} ) document.write('</noscript a="');
           </script><!--">
             #{capture(&block) if block_given?}
           <script>document.write('<'+'!'+'-'+'-')</script>-->

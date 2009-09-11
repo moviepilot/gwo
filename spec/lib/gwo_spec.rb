@@ -77,24 +77,24 @@ describe GWO do
 
     it "should return original output with javascript if ignore is unset and original is the variation " do
       gwo_section("gwo_section", :original) { "this is the content" }.should =~ /this is the content/
-      gwo_section("gwo_section", :original) { "this is the content" }.should =~ /( GWO_gwo_section != \"original\" )/
+      gwo_section("gwo_section", :original) { "this is the content" }.should =~ /( GWO_gwo_section_name != \"original\" )/
     end
 
     it "should only write one javascript block if the section is used for original and variations" do
       gwo_section("section", [:original, :variation1, :variation2]) { "this is the content" }.should     =~ /this is the content/
-      gwo_section("section", [:original, :variation1, :variation2]) { "this is the content" }.should     =~ /( GWO_section != \"original\" && GWO_section != \"variation1\" && GWO_section != \"variation2\" )/
+      gwo_section("section", [:original, :variation1, :variation2]) { "this is the content" }.should     =~ /( GWO_section_name != \"original\" && GWO_section_name != \"variation1\" && GWO_section_name != \"variation2\" )/
     end
 
     it "should write block for one variant" do
       gwo_section("section",:testing) { "this is the content" }.should     =~ /this is the content/ 
       gwo_section("section",:testing) { "this is the content" }.should_not =~ /utmx\(\"variation_content\", \"section\"\)/
-      gwo_section("section",:testing) { "this is the content" }.should     =~ /( GWO_section == \"testing\" )/
+      gwo_section("section",:testing) { "this is the content" }.should     =~ /( GWO_section_name == \"testing\" )/
     end
 
     it "should write one block but enabled for all given variants " do
       gwo_section("section",[:testing, :still_testing]) { "this is the content" }.should     =~ /this is the content/ 
       gwo_section("section",[:testing, :still_testing]) { "this is the content" }.should_not =~ /utmx\(\"variation_content\", \"section\"\)/
-      gwo_section("section",[:testing, :still_testing]) { "this is the content" }.should     =~ /( GWO_section == \"testing\" || GWO_section == \"still_testing\" )/
+      gwo_section("section",[:testing, :still_testing]) { "this is the content" }.should     =~ /( GWO_section_name == \"testing\" || GWO_section_name == \"still_testing\" )/
     end
   end
   
