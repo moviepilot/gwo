@@ -17,6 +17,60 @@ module GWO
       src
     end
 
+
+    def gwo_conversion(id, uacct, ignore = false)  
+      return js_logger("skipping conversion snippet: a/b variation test switched off", true) if ignore 
+
+      %{
+      <script type="text/javascript">
+      #{ js_logger("'conversion for test with id #{id} and uacct #{uacct}'") }
+      if(typeof(_gat)!='object')document.write('<sc'+'ript src="http'+
+      (document.location.protocol=='https:'?'s://ssl':'://www')+
+      '.google-analytics.com/ga.js"></sc'+'ript>')</script>
+      <script type="text/javascript">
+      try {
+      var pageTracker=_gat._getTracker("#{uacct}");
+      pageTracker._trackPageview("/#{id}/goal");
+      }catch(err){}</script>
+      }
+
+    end
+
+
+    def gwo_section(section = "gwo_section", variation_ids = nil, ignore = false, &block)
+      variation_ids = [*variation_ids].compact
+      src = ""
+      if is_default_section?(variation_ids)
+        if ignore
+          src += capture(&block)
+        else
+          conditions = (named_variations?(variation_ids) ? variation_ids.map{|x| "GWO_#{section}_name != \"#{x}\""} : variation_ids.map{|x| "GWO_#{section}_number != #{x}"}).join(" && ")
+
+          src += %{ <script>
+          if ( #{ conditions } ) document.write('<no' + 'script>');
+          </script>
+            #{capture(&block) if block_given?}
+          </noscript>
+          }
+        end
+      elsif not ignore
+        if !variation_ids.empty?
+          conditions = (named_variations?(variation_ids) ? variation_ids.map{|x| "GWO_#{section}_name == \"#{x}\""} : variation_ids.map{|x| "GWO_#{section}_number == #{x}"}).join(" || ") 
+             
+          src += %{<script>
+          if ( #{ conditions } ) document.write('</noscript a="');
+          </script><!--">
+            #{capture(&block) if block_given?}
+          <script>document.write('<'+'!'+'-'+'-')</script>-->
+          }
+        end
+      else
+        src =  js_logger("skipping snippet for #{variation_ids.join(", ")} variations: a/b variation test switched off", true) 
+      end
+      src
+    end
+
+    private
     def gwo_start(id, sections  = [], ignore=false)
       return js_logger("skipping start snippet: a/b variation test switched off", true) if ignore 
 
@@ -85,52 +139,18 @@ module GWO
 
     end
 
-    def gwo_conversion(id, uacct, ignore = false)  
-      return js_logger("skipping conversion snippet: a/b variation test switched off", true) if ignore 
-
-      %{
-      <script type="text/javascript">
-      #{ js_logger("'conversion for test with id #{id} and uacct #{uacct}'") }
-      if(typeof(_gat)!='object')document.write('<sc'+'ript src="http'+
-      (document.location.protocol=='https:'?'s://ssl':'://www')+
-      '.google-analytics.com/ga.js"></sc'+'ript>')</script>
-      <script type="text/javascript">
-      try {
-      var pageTracker=_gat._getTracker("#{uacct}");
-      pageTracker._trackPageview("/#{id}/goal");
-      }catch(err){}</script>
-      }
-
+    def is_default_section?(variation_ids)
+      variation_ids.include?(:original) || variation_ids.include?(0)
     end
 
+    def named_variations?(variation_ids)
+      raise RuntimeError.new("variation ids can only be either string, symbols or numbers") if [*variation_ids].compact.empty?   # catch empty hashes and nil
 
-    def gwo_section(section = "gwo_section", variation_numbers = nil, ignore = false, &block)
-      variation_numbers = [*variation_numbers].compact
-      src = ""
-      if variation_numbers.include?(:original) || variation_numbers.empty?
-        if ignore
-          src += capture(&block)
-        else
-          src += %{ <script>
-          if ( #{ variation_numbers.map{|x| "GWO_#{section}_name != \"#{x}\""}.join(" && ") } ) document.write('<no' + 'script>');
-          </script>
-            #{capture(&block) if block_given?}
-          </noscript>
-          }
-        end
-      elsif not ignore
-        if !variation_numbers.empty?
-          src += %{<script>
-          if ( #{variation_numbers.map{|x| "GWO_#{section}_name == \"#{x}\""}.join(" || ")} ) document.write('</noscript a="');
-          </script><!--">
-            #{capture(&block) if block_given?}
-          <script>document.write('<'+'!'+'-'+'-')</script>-->
-          }
-        end
-      else
-        src =  js_logger("skipping snippet for #{variation_numbers.join(", ")} variations: a/b variation test switched off", true) 
-      end
-      src
+      return false if [1, *variation_ids].map(&:class).uniq.length                 == 1  # all variation_ids are FixNums
+      return true  if ["string", :symbol, *variation_ids].map(&:class).uniq.length == 2  # all variation_ids are either string or symbol
+
+      raise RuntimeError.new("variation ids can only be either string, symbols or numbers")
     end
   end
+
 end

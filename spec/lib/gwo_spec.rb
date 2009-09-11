@@ -11,6 +11,37 @@ describe GWO do
     it "should not create google analytics stuff if option is disabled"
   end
 
+  describe "named_variations? method" do
+    it "should return false if one numbered variation is passed in" do
+      named_variations?(1).should == false
+    end
+    it "should return false if variations are numbered" do
+      named_variations?([1,2,3]).should == false
+    end
+
+    it "should return true if one string is passed in" do
+      named_variations?("string").should == true
+    end
+    it "should return true if one symbol is passed in" do
+      named_variations?(:symbol).should == true
+    end
+    it "should return true if symbols and strings are mixed" do
+      named_variations?([:symbol, "string", :symbol2]).should == true
+    end
+    it "should throw an exception if numbers and strings are mixed" do
+      lambda {named_variations?([1, :symbol])}.should           raise_error(RuntimeError)
+      lambda {named_variations?([1, "string"])}.should          raise_error(RuntimeError)
+      lambda {named_variations?([1, "string", :symbol])}.should raise_error(RuntimeError)
+    end
+    it "should throw an exception if one obscure object is passed in" do
+      lambda {named_variations?(Hash.new)}.should         raise_error(RuntimeError)
+      lambda {named_variations?(RuntimeError.new)}.should raise_error(RuntimeError)
+    end
+    it "should throw an exception if an array of obscure object is passed in" do
+      lambda {named_variations?([{}, {}])}.should raise_error(RuntimeError)
+    end
+  end
+
   describe "gwo_start method" do
     it "should produce correct output" do
       gwo_start("gwo_id", "section_name").should =~ /utmx section name='section_name'/
@@ -85,7 +116,7 @@ describe GWO do
     end
   end
 
-  describe "gwo_section method" do
+  describe "gwo_section method with named sections" do
       
     it "should return nothing when ignore is set to true and the variation is not the original" do
       gwo_section("gwo_section", ["foo","bar"], true).should == ""
@@ -107,14 +138,43 @@ describe GWO do
 
     it "should write block for one variant" do
       gwo_section("section",:testing) { "this is the content" }.should     =~ /this is the content/ 
-      gwo_section("section",:testing) { "this is the content" }.should_not =~ /utmx\(\"variation_content\", \"section\"\)/
       gwo_section("section",:testing) { "this is the content" }.should     =~ /( GWO_section_name == \"testing\" )/
     end
 
     it "should write one block but enabled for all given variants " do
       gwo_section("section",[:testing, :still_testing]) { "this is the content" }.should     =~ /this is the content/ 
-      gwo_section("section",[:testing, :still_testing]) { "this is the content" }.should_not =~ /utmx\(\"variation_content\", \"section\"\)/
       gwo_section("section",[:testing, :still_testing]) { "this is the content" }.should     =~ /( GWO_section_name == \"testing\" || GWO_section_name == \"still_testing\" )/
+    end
+  end
+
+  describe "gwo_section method with numbered sections" do
+      
+    it "should return nothing when ignore is set to true and the variation is not the original" do
+      gwo_section("gwo_section", [1, 2], true).should == ""
+    end
+
+    it "should return original output without javascript if ignore is true and original is the variation " do
+      gwo_section("gwo_section", 0, true) { "this is the content" }.should == "this is the content"
+    end
+
+    it "should return original output with javascript if ignore is unset and original is the variation " do
+      gwo_section("gwo_section", 0) { "this is the content" }.should =~ /this is the content/
+      gwo_section("gwo_section", 0) { "this is the content" }.should =~ /( GWO_gwo_section_number != 0 )/
+    end
+
+    it "should only write one javascript block if the section is used for original and variations" do
+      gwo_section("section", [0, 1, 2]) { "this is the content" }.should     =~ /this is the content/
+      gwo_section("section", [0, 1, 2]) { "this is the content" }.should     =~ /( GWO_section_number != 0 && GWO_section_number != 1 && GWO_section_number != 2 )/
+    end
+
+    it "should write block for one variant" do
+      gwo_section("section",1) { "this is the content" }.should     =~ /this is the content/ 
+      gwo_section("section",1) { "this is the content" }.should     =~ /( GWO_section_number == 1 )/
+    end
+
+    it "should write one block but enabled for all given variants " do
+      gwo_section("section",[1, 2]) { "this is the content" }.should     =~ /this is the content/ 
+      gwo_section("section",[1, 2]) { "this is the content" }.should     =~ /( GWO_section_number == 1 || GWO_section_number == 2 )/
     end
   end
   
