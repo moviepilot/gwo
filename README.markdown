@@ -1,16 +1,21 @@
-NOTE: THIS VERSION HAS DRIFTED AWAY QUITE A BIT FROM THE ORIGINAL GWO PLUGIN ... I'LL UPDATE DOCUMENTATION SHORTLY, BUT THE WHOLE THING DOES NOT HAVE TO DO VERY MUCH WITH THE ORIGINAL GWO
+This is a Ruby on Rails plugin (gem) which simplifies Server-Side Dynamic Section Variations with 
+Google Website Optimizer (http://www.google.com/websiteoptimizer) as described on 
+http://www.gwotricks.com/2009/05/server-side-dynamic-section-variations.html
 
-GWO
-===
+== Features: 
 
-Rails plugin for Google Website Optimizer which easily allows AB testing.
-http://www.google.com/websiteoptimizer
+* very good Ruby on Rails integration
+* very simple to use
+* support for several sections that should have different variants
+* support for named and numbered sections
+* support for <b>google analytics</b> tracking
+* kill-switch
+* well tested
 
-This plugin also allows dynamic content, which GWO doesn't natively support.
 
 The 'Usage' may look long - but it's fairly straightforward and shouldn't take 5 mins.
 
-Alex MacCaw - alex@madebymany.co.uk
+Daniel Bornkessel gwo@bornkessel.com & Alex MacCaw - alex@madebymany.co.uk (original author)
 
 Usage
 =====
