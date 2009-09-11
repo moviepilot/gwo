@@ -47,6 +47,9 @@ module GWO
             var GWO_#{section}_name = utmx("variation_content", "#{section}");
             if( GWO_#{section}_name == undefined) GWO_#{section}_name = 'original';
 
+            var GWO_#{section}_number = utmx("variation_number", "#{section}");
+            if( GWO_#{section}_number == undefined) GWO_#{section}_number = 0;
+
             #{ js_logger("'variant: ' + GWO_#{section}_name") }
         }
         google_analytics_info += "google_analytics_info += \"|GWO_#{section}_name:\" + GWO_#{section}_name;"

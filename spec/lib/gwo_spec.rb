@@ -4,10 +4,18 @@ require 'lib/gwo'
 describe GWO do
   include GWO::Helper
 
+  describe "google analytics stuff" do
+    it "should create correct google analytics stuff for default urls"
+    it "should create correct google analytics stuff for static urls"
+    it "should create correct google analytics stuff for several sections"
+    it "should not create google analytics stuff if option is disabled"
+  end
+
   describe "gwo_start method" do
     it "should produce correct output" do
       gwo_start("gwo_id", "section_name").should =~ /utmx section name='section_name'/
       gwo_start("gwo_id", "section_name").should =~ /utmx\(\"variation_content\", \"section_name\"\)/
+      gwo_start("gwo_id", "section_name").should =~ /utmx\(\"variation_number\", \"section_name\"\)/
       gwo_start("gwo_id", "section_name").should =~ /k='gwo_id'/
     end
 
@@ -15,12 +23,14 @@ describe GWO do
       gwo_start("gwo_id").should =~ /k='gwo_id'/
       gwo_start("gwo_id").should =~ /utmx section name='gwo_section'/
       gwo_start("gwo_id").should =~ /utmx\(\"variation_content\", \"gwo_section\"\)/
+      gwo_start("gwo_id").should =~ /utmx\(\"variation_number\", \"gwo_section\"\)/
       gwo_start("gwo_id", nil).should =~ /utmx section name='gwo_section'/
     end
 
     it "should work with one single section ... section is a symbol" do
       gwo_start("gwo_id", :section_name).should =~ /utmx section name='section_name'/
       gwo_start("gwo_id", :section_name).should =~ /utmx\(\"variation_content\", \"section_name\"\)/
+      gwo_start("gwo_id", :section_name).should =~ /utmx\(\"variation_number\", \"section_name\"\)/
       gwo_start("gwo_id", :section_name).should =~ /k='gwo_id'/
     end
 
@@ -28,17 +38,27 @@ describe GWO do
       gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx section name='body'/
       gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx section name='content'/
       gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx section name='footer'/
+
       gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx\(\"variation_content\", \"body\"\)/
       gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx\(\"variation_content\", \"content\"\)/
       gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx\(\"variation_content\", \"footer\"\)/
+
+      gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx\(\"variation_number\", \"body\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx\(\"variation_number\", \"content\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"]).should =~ /utmx\(\"variation_number\", \"footer\"\)/
     end
 
     it "should return nothing when ignore is set to true" do
       gwo_start("id", [], true).should == "" 
       gwo_start("gwo_id", ["body",:content,"footer"], true).should == ""
+
       gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_content\", \"body\"\)/
       gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_content\", \"content\"\)/
       gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_content\", \"footer\"\)/
+      
+      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_number\",  \"body\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_number\",  \"content\"\)/
+      gwo_start("gwo_id", ["body",:content,"footer"], true).should_not =~ /utmx\(\"variation_number\",  \"footer\"\)/
     end
   end
 
