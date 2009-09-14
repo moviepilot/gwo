@@ -9,13 +9,17 @@ module GWO
   module Helper
 
     include ::ActionView::Helpers::CaptureHelper
-    
-    def js_logger(text, with_js_tag = false)
-      return "if(typeof(console.log) == 'function') console.log(#{text});" if RAILS_ENV != "test" && RAILS_ENV != "production" && !with_js_tag
-      return "<script type='text/javascript'>if(typeof(console.log) == 'function') console.log(\"#{text}\");</script>" if RAILS_ENV != "test" && RAILS_ENV != "production" && with_js_tag
-      return ""
-    end
-
+     
+    # start a gwo_experiment 
+    #
+    # Params: 
+    # * <b>id</b>       the id of the experiment (in the google Tracking Script look for something like <tt>pageTracker._trackPageview("/<ID>/test");</tt> )
+    # * <b>uacct</b>    account number (in the google Tracking Script look for something like <tt>var pageTracker=_gat._getTracker("<UACCT>");</tt> )
+    # * <b>sections</b> name of the section(s) your page will include; pass in one symbol/string or an array of symbols/strings here
+    # * <b>options</b>  hash of possible options:
+    #   * <b>:conditions</b>  if set to false, the experiment won't be executed -- only the source code of the :original (or 0) variants would be shown. No JavaScript code will be produced. It serves as a kill switch for the gwo experiment. If, for example, you only want to execute an experiment for users that are not logged in, you could pass <tt>:conditions => !logged_in?</tt> here.
+    #   * <b>:ga_tracking</b> executes a <tt>trackPageView(...)</tt> for google analytics tracking. It adds parameters to the URL, so you can identify which variant (or combination) the user saw (handy if you want to check on the exit rate with GA)
+    #   * <b>:ga_base_url</b> set a static base URL for google analytics: Say your variant is in a 'show' view, GA would track a lot of different URLs (as the show view url contains the ID). If you are just interested about the variants in GA, set a static URL here (i.e. hbp://<your domain>/ab-testing ) and GA tracking will always be that static domain + parameters with information about the variant the user saw.
     def gwo_experiment(id, uacct, sections = [], options = {}, &block)
       options = {
         :conditions => true,
@@ -30,6 +34,12 @@ module GWO
     end
 
 
+    # to be included on the conversion page. 
+    #
+    # Params: 
+    # * <b>id</b> & <b>uacct</b> see gwo_experiment
+    # * <b>options</b>
+    #   * :conditions as in gwo_experiment
     def gwo_conversion(id, uacct, options = {})  
       options = {
         :conditions => true
@@ -53,6 +63,13 @@ module GWO
     end
 
 
+    # identify a section which is only visible in certain variants
+    #
+    # Params:
+    # * <b>section</b> name of the section
+    # * <b>variation_ids</b> identifiers of the variants in which this content is to be shown. Can be either a name of the variant (== the <b><i>content</i></b> of a variant in the GWO web interface) or a number. The original content has the reserved name <tt>:original</tt> or the number <tt>0</tt> respectivly. If the content should be shown in more than one variant, pass in an array of identifiers. Mixing numbered and named variant ids will result in an exception.
+    # * <b>options</b>
+    #   * :conditions as in gwo_experiment
     def gwo_section(section = "gwo_section", variation_ids = nil, options = {}, &block)
       options = {
         :conditions => true
@@ -91,6 +108,12 @@ module GWO
     end
 
     private
+    def js_logger(text, with_js_tag = false)
+      return "if(typeof(console.log) == 'function') console.log(#{text});" if RAILS_ENV != "test" && RAILS_ENV != "production" && !with_js_tag
+      return "<script type='text/javascript'>if(typeof(console.log) == 'function') console.log(\"#{text}\");</script>" if RAILS_ENV != "test" && RAILS_ENV != "production" && with_js_tag
+      return ""
+    end
+
     def gwo_start(id, sections  = [], options = {})
 
       return js_logger("skipping start snippet: a/b variation test switched off", true) if options[:conditions] == false
