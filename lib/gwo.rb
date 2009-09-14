@@ -150,7 +150,7 @@ module GWO
 \
             #{ js_logger("'variant: ' + GWO_#{section}_name") }\
         }
-        google_analytics_info += "google_analytics_info += \"&GWO_#{section}_name=\" + GWO_#{section}_name;" if options[:ga_tracking]
+        google_analytics_info += "google_analytics_info += \"&#{section}=\" + GWO_#{section}_name;" if options[:ga_tracking]
       end
 
       if options[:ga_tracking]
@@ -158,8 +158,8 @@ module GWO
         variable_assignments += %{\
            window.onload = function(){ \
             var google_analytics_info = ''; #{google_analytics_info}; if(typeof(trackPageView) == 'function') {\
-              trackPageView(#{base_url} + "?ab_test=true" + google_analytics_info);\
-              #{js_logger("#{base_url} + \"?ab_test=true\" + google_analytics_info")}\
+              trackPageView(#{base_url} + "?ab_test=#{id}" + google_analytics_info);\
+              #{js_logger("#{base_url} + \"?ab_test=#{id}\" + google_analytics_info")}\
             }\
           }\
         }
