@@ -1,3 +1,6 @@
+NOTE: CURRENTLY THIS WORKS ONLY WITH HAML ... I HAVE TO FIX IT IN ORDER TO GET IT RUNNING WITH ERB
+
+
 This is a Ruby on Rails plugin (gem) which simplifies Server-Side Dynamic Section Variations with 
 [Google Website Optimizer](http://www.google.com/websiteoptimizer) as described in the article
 [Server-Side Dynamic Section Variations on gwotricks.com](http://www.gwotricks.com/2009/05/server-side-dynamic-section-variations.html)
