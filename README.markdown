@@ -67,54 +67,57 @@ To use GWO, you need two pages:
 ----------
 ... in haml:
 
-  = gwo_experiment("1662461989", "UA-6882082-1", :signup_box_test, :conditions => (signed_up? && country == "de")) do
-    = gwo_section(:signup_box_test, [:with_sidebar_and_top_signup_box, :minimalistic], :ga_tracking => true, :conditions => (signed_up? && country == "de")) do
-      = render :partial => 'gossib/signup'
-      %span I am only visible in the variants :with_sidebar_and_top_signup_box and :minimalistic
+    = gwo_experiment("1662461989", "UA-6882082-1", :signup_box_test, :conditions => (signed_up? && country == "de")) do
+      = gwo_section(:signup_box_test, [:with_sidebar_and_top_signup_box, :minimalistic], :ga_tracking => true, :conditions => (signed_up? && country == "de")) do
+        = render :partial => 'gossib/signup'
+        %span I am only visible in the variants :with_sidebar_and_top_signup_box and :minimalistic
 
-    = gwo_section(:signup_box_test, [:original, :with_sidebar_and_top_signup_box], :conditions => (signed_up? && country == "de")) do
-      = render :partial => 'gossib/bookmark_menu'
-      = render :partial => 'gossip/pics', :locals => {:images       => @article.images}
-      .box#
-        %span Hi hi ... I am not visible in :minimalistic
-  
-    %span I am visible in every variation
-  
-    = gwo_section(:signup_box_test, :original, :conditions => (signed_up? && country == "de")) do
-      %span I am only in the original page
+      = gwo_section(:signup_box_test, [:original, :with_sidebar_and_top_signup_box], :conditions => (signed_up? && country == "de")) do
+        = render :partial => 'gossib/bookmark_menu'
+        = render :partial => 'gossip/pics', :locals => {:images       => @article.images}
+        .box#
+          %span Hi hi ... I am not visible in :minimalistic
+    
+      %span I am visible in every variation
+    
+      = gwo_section(:signup_box_test, :original, :conditions => (signed_up? && country == "de")) do
+        %span I am only in the original page
   
 ... or in erb:
 
-  <% gwo_experiment("1662461989", "UA-6882082-1", :signup_box_test, :conditions => (signed_up? && country == "de")) do %>
-    <% render :partial => 'gossip/article.html.haml',  :object => @article %>
-  
-    <% gwo_section(:signup_box_test, [:with_sidebar_and_top_signup_box, :minimalistic], :conditions => (signed_up? && country == "de")) do %> 
-      <%= render :partial => 'gossib/signup' %>
-      <span> I am only visible in the variants :with_sidebar_and_top_signup_box and :minimalistic</span>
-    <% end %>
+    <% gwo_experiment("1662461989", "UA-6882082-1", :signup_box_test, :conditions => (signed_up? && country == "de")) do %>
+      <% render :partial => 'gossip/article.html.haml',  :object => @article %>
+    
+      <% gwo_section(:signup_box_test, [:with_sidebar_and_top_signup_box, :minimalistic], :conditions => (signed_up? && country == "de")) do %> 
+        <%= render :partial => 'gossib/signup' %>
+        <span> I am only visible in the variants :with_sidebar_and_top_signup_box and :minimalistic</span>
+      <% end %>
 
-    <% gwo_section(:signup_box_test, [:original, :with_sidebar_and_top_signup_box], :conditions => (signed_up? && country == "de")) do %>
-      <%= render :partial => 'gossib/bookmark_menu' %>
-      <%= render :partial => 'gossip/pics', :locals => {:images       => @article.images} %>
-      <div class="box">
-        <span> Hi hi ... I am not visible in :minimalistic</span>
+      <% gwo_section(:signup_box_test, [:original, :with_sidebar_and_top_signup_box], :conditions => (signed_up? && country == "de")) do %>
+        <%= render :partial => 'gossib/bookmark_menu' %>
+        <%= render :partial => 'gossip/pics', :locals => {:images       => @article.images} %>
+        <div class="box">
+          <span> Hi hi ... I am not visible in :minimalistic</span>
+      <% end %>
+    
+      <span> I am visible in every variation</span>
+    
+      <% gwo_section(:signup_box_test, :original, :conditions => (signed_up? && country == "de")) do %>
+        <span> I am only in the original page</span>
+      <% end %>
     <% end %>
-  
-    <span> I am visible in every variation</span>
-  
-    <% gwo_section(:signup_box_test, :original, :conditions => (signed_up? && country == "de")) do %>
-      <span> I am only in the original page</span>
-    <% end %>
-  <% end %>
 
 
 == Conversion page:
 ------------------
 ... haml:
-  = gwo_conversion('UA-23902382-1', '1909920434')
+
+    = gwo_conversion('UA-23902382-1', '1909920434')
 
 ... erb:
-  <%= gwo_conversion('UA-23902382-1', '1909920434') %>
+
+    <%= gwo_conversion('UA-23902382-1', '1909920434') %>
+
 
 
 Copyright (c) 2009 Made by Many, released under the MIT license
