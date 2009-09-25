@@ -33,12 +33,12 @@ end
 
 desc 'Install latest gem'
 task :install_only do
-  system "sudo gem install $( ls -t -1 *.gem | head -n 1 )"
+  system "gem install $( ls -t -1 *.gem | head -n 1 )"
 end
 
 desc 'Build and install gem' 
 task :install do
   system "gem build gwo.gemspec"
-  system "sudo gem install $( ls -t -1 *.gem | head -n 1 )"
+  system "gem install $( ls -t -1 *.gem | head -n 1 )"
 end
 
