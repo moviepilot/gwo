@@ -18,13 +18,14 @@ module GWO
     # * <b>sections</b> name of the section(s) your page will include; pass in one symbol/string or an array of symbols/strings here
     # * <b>options</b>  hash of possible options:
     #   * <b>:conditions</b>  if set to false, the experiment won't be executed -- only the source code of the :original (or 0) variants would be shown. No JavaScript code will be produced. It serves as a kill switch for the gwo experiment. If, for example, you only want to execute an experiment for users that are not logged in, you could pass <tt>:conditions => !logged_in?</tt> here.
+    #   * <b>:google_analytics</b> a hash for google analytics tracking:
+    #     * <b>:account_number</b>
+    #     * <b>:virtual_url</b>
     #   * <b>:ga_tracking</b> executes a <tt>trackPageView(...)</tt> for google analytics tracking. It adds parameters to the URL, so you can identify which variant (or combination) the user saw (handy if you want to check on the exit rate with GA)
     #   * <b>:ga_base_url</b> set a static base URL for google analytics: Say your variant is in a 'show' view, GA would track a lot of different URLs (as the show view url contains the ID). If you are just interested about the variants in GA, set a static URL here (i.e. hbp://<your domain>/ab-testing ) and GA tracking will always be that static domain + parameters with information about the variant the user saw.
     def gwo_experiment(id, uacct, sections = [], options = {}, &block)
       options = {
         :conditions => true,
-        :ga_tracking => false,
-        :ga_base_url => nil
       }.update(options)
 
       src  = gwo_start(id, sections, options)
@@ -55,8 +56,8 @@ module GWO
       '.google-analytics.com/ga.js"></sc'+'ript>')</script>
       <script type="text/javascript">
       try {
-      var pageTracker=_gat._getTracker("#{uacct}");
-      pageTracker._trackPageview("/#{id}/goal");
+      var gwoPageTracker=_gat._getTracker("#{uacct}");
+      gwoPageTracker._trackPageview("/#{id}/goal");
       }catch(err){}</script>
       }
 
@@ -142,26 +143,24 @@ module GWO
         section_definitions += "<!-- utmx section name='#{section}' -->\n"
 
         variable_assignments += %{\
-            var GWO_#{section}_name = utmx("variation_content", "#{section}");\
-            if( GWO_#{section}_name == undefined) GWO_#{section}_name = 'original';\
-\
-            var GWO_#{section}_number = utmx("variation_number", "#{section}");\
-            if( GWO_#{section}_number == undefined) GWO_#{section}_number = 0;\
-\
-            #{ js_logger("'variant: ' + GWO_#{section}_name") }\
+            var GWO_#{section}_name = utmx("variation_content", "#{section}");
+            if( GWO_#{section}_name == undefined) GWO_#{section}_name = 'original';
+            var GWO_#{section}_number = utmx("variation_number", "#{section}");
+            if( GWO_#{section}_number == undefined) GWO_#{section}_number = 0;
+
+            #{ js_logger("'variant: ' + GWO_#{section}_name") }
         }
-        google_analytics_info += "google_analytics_info += \"&#{section}=\" + GWO_#{section}_name;" if options[:ga_tracking]
+        google_analytics_info += "google_analytics_info += \"&#{section}=\" + GWO_#{section}_name;" if options[:google_analytics]
       end
 
-      if options[:ga_tracking]
-        base_url = options[:ga_base_url] ? "\"#{options[:ga_base_url]}\"" : "document.location"
-        variable_assignments += %{\
-           window.onload = function(){ \
-            var google_analytics_info = ''; #{google_analytics_info}; if(typeof(trackPageView) == 'function') {\
-              trackPageView(#{base_url} + "?ab_test=#{id}" + google_analytics_info);\
-              #{js_logger("#{base_url} + \"?ab_test=#{id}\" + google_analytics_info")}\
-            }\
-          }\
+      # GOOGLE TRACKER:
+      if options[:google_analytics]
+        base_url = options[:google_analytics][:virtual_url] ? "\"#{options[:google_analytics][:virtual_url]}\"" : "document.location"
+        variable_assignments += %{
+           var google_analytics_info = ''; #{google_analytics_info};
+           var gwoGaPageTracker=_gat._getTracker("#{options[:google_analytics][:account_number]}");gwoGaPageTracker._initData(); 
+           gwoGaPageTracker._trackPageview(#{base_url} + "?ab_test=#{id}" + google_analytics_info);
+           #{js_logger("#{base_url} + \"?ab_test=#{id}\" + google_analytics_info")}
         }
       end
 
@@ -179,8 +178,8 @@ module GWO
       '.google-analytics.com/ga.js"></sc'+'ript>')</script>
       <script type="text/javascript">
       try {
-      var pageTracker=_gat._getTracker("#{uacct}");
-      pageTracker._trackPageview("/#{id}/test");
+      var gwoPageTracker=_gat._getTracker("#{uacct}");
+      gwoPageTracker._trackPageview("/#{id}/test");
       }catch(err){}</script>
       }
 
