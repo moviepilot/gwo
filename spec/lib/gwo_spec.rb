@@ -23,7 +23,7 @@ describe GWO do
       gwo_start("gwo_id", "section_name", :google_analytics => {:account_id => "123456789", :virtual_url => "http://example.com"}).should =~ 
         /google_analytics_info \+= \"&section_name=\" \+ GWO_section_name_name;/
       gwo_start("gwo_id", "section_name", :google_analytics => {:account_id => "123456789", :virtual_url => "http://example.com"}).should =~ 
-         /var gwoGaPageTracker=_gat._getTracker\(\"123456789\"\);gwoGaPageTracker._initData\(\);/
+         /var gwoGaPageTracker=_gat._getTracker\(\"123456789\"\);/
       gwo_start("gwo_id", "section_name", :google_analytics => {:account_id => "123456789", :virtual_url => "http://example.com"}).should =~ 
         /gwoGaPageTracker._trackPageview\(\"http:\/\/example\.com\" \+ \"\?ab_test=gwo_id\" \+ google_analytics_info\)/
     end

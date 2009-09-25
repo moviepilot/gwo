@@ -154,10 +154,14 @@ module GWO
       if options[:google_analytics]
         base_url = options[:google_analytics][:virtual_url] ? "\"#{options[:google_analytics][:virtual_url]}\"" : "document.location"
         variable_assignments += %{
-           var google_analytics_info = ''; #{google_analytics_info};
-           var gwoGaPageTracker=_gat._getTracker("#{options[:google_analytics][:account_id]}");gwoGaPageTracker._initData(); 
-           gwoGaPageTracker._trackPageview(#{base_url} + "?ab_test=#{id}" + google_analytics_info);
-           #{js_logger("#{base_url} + \"?ab_test=#{id}\" + google_analytics_info")}
+          window.onload = function(){ 
+            var google_analytics_info = ''; #{google_analytics_info};
+            try{
+              var gwoGaPageTracker=_gat._getTracker("#{options[:google_analytics][:account_id]}");
+              gwoGaPageTracker._trackPageview(#{base_url} + "?ab_test=#{id}" + google_analytics_info);
+            }catch(err){ #{js_logger("\"error executing google analytics request\"")} }
+            #{js_logger("\"tracking \" + #{base_url} + \"?ab_test=#{id}\" + google_analytics_info + \" to account #{options[:google_analytics][:account_id]}\"")}
+          }
         }
       end
 
