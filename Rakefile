@@ -25,3 +25,20 @@ Rake::RDocTask.new(:rdoc) do |rdoc|
   rdoc.rdoc_files.include('README')
   rdoc.rdoc_files.include('lib/**/*.rb')
 end
+
+desc 'Build gem'
+task :build do
+  system "gem build gwo.gemspec"
+end
+
+desc 'Install latest gem'
+task :install_only do
+  system "sudo gem install $( ls -t -1 *.gem | head -n 1 )"
+end
+
+desc 'Build and install gem' 
+task :install do
+  system "gem build gwo.gemspec"
+  system "sudo gem install $( ls -t -1 *.gem | head -n 1 )"
+end
+
