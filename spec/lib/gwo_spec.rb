@@ -15,25 +15,24 @@ describe GWO do
     end
 
     it "should create correct google analytics stuff for default urls" do
-      gwo_start("gwo_id", "section_name", :ga_tracking => true).should =~ /google_analytics_info \+= \"&section_name=\" \+ GWO_section_name_name;/
-      gwo_start("gwo_id", "section_name", :ga_tracking => true).should =~ /gwoGaPageTracker\(document.location \+ \"\?ab_test=gwo_id\" \+ google_analytics_info\)/
+      gwo_start("gwo_id", "section_name", :google_analytics => {:account_id => "123456789"}).should =~ /google_analytics_info \+= \"&section_name=\" \+ GWO_section_name_name;/
+      gwo_start("gwo_id", "section_name", :google_analytics => {:account_id => "123456789"}).should =~ /gwoGaPageTracker._trackPageview\(document.location \+ \"\?ab_test=gwo_id\" \+ google_analytics_info\)/
     end
 
     it "should create correct google analytics stuff for static urls" do
-      gwo_start("gwo_id", "section_name", :google_analytics => {:account_number => "123456789", :virtual_url => "http://example.com"}).should =~ 
+      gwo_start("gwo_id", "section_name", :google_analytics => {:account_id => "123456789", :virtual_url => "http://example.com"}).should =~ 
         /google_analytics_info \+= \"&section_name=\" \+ GWO_section_name_name;/
-      gwo_start("gwo_id", "section_name", :google_analytics => {:account_number => "123456789", :virtual_url => "http://example.com"}).should =~ 
-         /var gwoGaPageTracker=_gat._getTracker("123456789");gwoGaPageTracker._initData();/
-      gwo_start("gwo_id", "section_name", :google_analytics => {:account_number => "123456789", :virtual_url => "http://example.com"}).should =~ 
-        /gwoGaPageTracker\(\"http:\/\/example\.com\" \+ \"\?ab_test=gwo_id\" \+ google_analytics_info\)/
+      gwo_start("gwo_id", "section_name", :google_analytics => {:account_id => "123456789", :virtual_url => "http://example.com"}).should =~ 
+         /var gwoGaPageTracker=_gat._getTracker\(\"123456789\"\);gwoGaPageTracker._initData\(\);/
+      gwo_start("gwo_id", "section_name", :google_analytics => {:account_id => "123456789", :virtual_url => "http://example.com"}).should =~ 
+        /gwoGaPageTracker._trackPageview\(\"http:\/\/example\.com\" \+ \"\?ab_test=gwo_id\" \+ google_analytics_info\)/
     end
 
     it "should create correct google analytics stuff for several sections" do
-      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :google_analytics => {:account_number => "123456789"}).should =~ /google_analytics_info \+= \"&section_name1=\" \+ GWO_section_name1_name;/
-      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :google_analytics => {:account_number => "123456789"}).should =~ /google_analytics_info \+= \"&section_name2=\" \+ GWO_section_name2_name;/
-      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :google_analytics => {:account_number => "123456789"}).should =~ /google_analytics_info \+= \"&section_name3=\" \+ GWO_section_name3_name;/
-puts gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :google_analytics => {:account_number => "123456789"})
-      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :google_analytics => {:account_number => "123456789"}).should =~ /gwoGaPageTracker\(document.location \+ \"\?ab_test=gwo_id\" \+ google_analytics_info\)/
+      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :google_analytics => {:account_id => "123456789"}).should =~ /google_analytics_info \+= \"&section_name1=\" \+ GWO_section_name1_name;/
+      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :google_analytics => {:account_id => "123456789"}).should =~ /google_analytics_info \+= \"&section_name2=\" \+ GWO_section_name2_name;/
+      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :google_analytics => {:account_id => "123456789"}).should =~ /google_analytics_info \+= \"&section_name3=\" \+ GWO_section_name3_name;/
+      gwo_start("gwo_id", ["section_name1", "section_name2", "section_name3"], :google_analytics => {:account_id => "123456789"}).should =~ /gwoGaPageTracker._trackPageview\(document.location \+ \"\?ab_test=gwo_id\" \+ google_analytics_info\)/
     end
 
   end

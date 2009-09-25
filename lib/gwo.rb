@@ -142,12 +142,9 @@ module GWO
       sections.each do |section|
         section_definitions += "<!-- utmx section name='#{section}' -->\n"
 
-        variable_assignments += %{\
-            var GWO_#{section}_name = utmx("variation_content", "#{section}");
-            if( GWO_#{section}_name == undefined) GWO_#{section}_name = 'original';
-            var GWO_#{section}_number = utmx("variation_number", "#{section}");
-            if( GWO_#{section}_number == undefined) GWO_#{section}_number = 0;
-
+        variable_assignments += %{
+            var GWO_#{section}_name = utmx("variation_content", "#{section}");if( GWO_#{section}_name == undefined) GWO_#{section}_name = 'original';
+            var GWO_#{section}_number = utmx("variation_number", "#{section}");if( GWO_#{section}_number == undefined) GWO_#{section}_number = 0;
             #{ js_logger("'variant: ' + GWO_#{section}_name") }
         }
         google_analytics_info += "google_analytics_info += \"&#{section}=\" + GWO_#{section}_name;" if options[:google_analytics]
@@ -158,7 +155,7 @@ module GWO
         base_url = options[:google_analytics][:virtual_url] ? "\"#{options[:google_analytics][:virtual_url]}\"" : "document.location"
         variable_assignments += %{
            var google_analytics_info = ''; #{google_analytics_info};
-           var gwoGaPageTracker=_gat._getTracker("#{options[:google_analytics][:account_number]}");gwoGaPageTracker._initData(); 
+           var gwoGaPageTracker=_gat._getTracker("#{options[:google_analytics][:account_id]}");gwoGaPageTracker._initData(); 
            gwoGaPageTracker._trackPageview(#{base_url} + "?ab_test=#{id}" + google_analytics_info);
            #{js_logger("#{base_url} + \"?ab_test=#{id}\" + google_analytics_info")}
         }
