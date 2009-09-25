@@ -18,11 +18,9 @@ module GWO
     # * <b>sections</b> name of the section(s) your page will include; pass in one symbol/string or an array of symbols/strings here
     # * <b>options</b>  hash of possible options:
     #   * <b>:conditions</b>  if set to false, the experiment won't be executed -- only the source code of the :original (or 0) variants would be shown. No JavaScript code will be produced. It serves as a kill switch for the gwo experiment. If, for example, you only want to execute an experiment for users that are not logged in, you could pass <tt>:conditions => !logged_in?</tt> here.
-    #   * <b>:google_analytics</b> a hash for google analytics tracking:
-    #     * <b>:account_number</b>
-    #     * <b>:virtual_url</b>
-    #   * <b>:ga_tracking</b> executes a <tt>trackPageView(...)</tt> for google analytics tracking. It adds parameters to the URL, so you can identify which variant (or combination) the user saw (handy if you want to check on the exit rate with GA)
-    #   * <b>:ga_base_url</b> set a static base URL for google analytics: Say your variant is in a 'show' view, GA would track a lot of different URLs (as the show view url contains the ID). If you are just interested about the variants in GA, set a static URL here (i.e. hbp://<your domain>/ab-testing ) and GA tracking will always be that static domain + parameters with information about the variant the user saw.
+    #   * <b>:google_analytics</b> a hash for google analytics tracking: it will call the google analytics script with either the document.location or a virtual url if you provide it.
+    #     * <b>:account_number</b> the google analytics account id where the tracking should take place
+    #     * <b>:virtual_url</b> if you want to choose a different tracking url then the document.location for tracking
     def gwo_experiment(id, uacct, sections = [], options = {}, &block)
       options = {
         :conditions => true,
