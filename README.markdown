@@ -33,7 +33,7 @@ To use GWO, you need two pages:
 
  1.  Click create another experiment
  2.  Click multivariate experiment
- 3.  Name it and enter the test/conversion urls
+ 3.  Name it and enter the test/conversion urls (if the test will be included on multiple pages (/movies/:id), just choose one of the urls) ... actually the urls you type in don't really matter)
  4.  Select 'You will install and validate the JavaScript tags'
  5.  Ignore the scripts that are offered, but strip out your account id (uacct) and test id (both to be found in the Tracking Script).
      They look like as follows:
