@@ -143,6 +143,10 @@ describe GWO do
   end
 
   describe "gwo_section method with named sections" do
+    before(:each) do
+      stub!(:output_buffer=).and_return "foo"
+      stub!(:output_buffer).and_return "foo"
+    end
       
     it "should return nothing when conditions are not met and the variation is not the original" do
       gwo_section("gwo_section", ["foo","bar"], {:conditions => false}).should == ""
@@ -174,6 +178,11 @@ describe GWO do
   end
 
   describe "gwo_section method with numbered sections" do
+    before(:each) do
+      stub!(:output_buffer=).and_return "foo"
+      stub!(:output_buffer).and_return "foo"
+    end
+      
       
     it "should return nothing when conditions are not met and the variation is not the original" do
       gwo_section("gwo_section", [1, 2], {:conditions => false}).should == ""

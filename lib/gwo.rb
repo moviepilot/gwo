@@ -5,10 +5,12 @@
 #
 
 require 'action_view/helpers/capture_helper'
+require 'action_view/helpers/tag_helper'
 module GWO
   module Helper
 
     include ::ActionView::Helpers::CaptureHelper
+    include ::ActionView::Helpers::TagHelper
      
     # start a gwo_experiment 
     #
@@ -18,7 +20,7 @@ module GWO
     # * <b>sections</b> name of the section(s) your page will include; pass in one symbol/string or an array of symbols/strings here
     # * <b>options</b>  hash of possible options:
     #   * <b>:conditions</b>  if set to false, the experiment won't be executed -- only the source code of the :original (or 0) variants would be shown. No JavaScript code will be produced. It serves as a kill switch for the gwo experiment. If, for example, you only want to execute an experiment for users that are not logged in, you could pass <tt>:conditions => !logged_in?</tt> here.
-    #   * <b>:google_analytics</b> a hash for google analytics tracking: it will call the google analytics script with either the document.location or a virtual url if you provide it.
+    #   * <b>:google_analytics</b> a hash for google analytics tracking: it will call the google analytics script with either the document.location or a virtual url if you provide it. At the end of the url, gwo appends information about which a/b test was executed and which section was the user had in the form of url parameters (s.th. like <tt> http://&lt;url&gt;?ab_test=&lt;id&gt;&section=&lt;section name &gt; </tt>)
     #     * <b>:account_number</b> the google analytics account id where the tracking should take place
     #     * <b>:virtual_url</b> if you want to choose a different tracking url then the document.location for tracking
     def gwo_experiment(id, uacct, sections = [], options = {}, &block)
