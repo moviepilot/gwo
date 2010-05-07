@@ -23,14 +23,46 @@ module GWO
     #   * <b>:google_analytics</b> a hash for google analytics tracking: it will call the google analytics script with either the document.location or a virtual url if you provide it. At the end of the url, gwo appends information about which a/b test was executed and which section was the user had in the form of url parameters (s.th. like <tt> http://&lt;url&gt;?ab_test=&lt;id&gt;&section=&lt;section name &gt; </tt>)
     #     * <b>:account_number</b> the google analytics account id where the tracking should take place
     #     * <b>:virtual_url</b> if you want to choose a different tracking url then the document.location for tracking
+    #     * <b>:goal_is_bounce_rate</b> if true, every click on a link on the current view is counted as a goal (NOTE: this includes external links as well)
     def gwo_experiment(id, uacct, sections = [], options = {}, &block)
       options = {
         :conditions => true,
+        :goal_is_bounce_rate => false
       }.update(options)
 
       src  = gwo_start(id, sections, options)
-      src += capture(&block) 
+      src += capture(&block) if block
       src += gwo_end(id, uacct, options)
+
+      if options[:goal_is_bounce_rate]
+        src +=<<JS
+<script type="text/javascript"><!--
+    function addEvent( obj, type, fn ) {
+       if (obj.addEventListener) {
+          obj.addEventListener( type, fn, false );
+       } else if (obj.attachEvent) {
+          obj["e"+type+fn] = fn;
+          obj[type+fn] = function() { obj["e"+type+fn]( window.event ); }
+          obj.attachEvent( "on"+type, obj[type+fn] );
+       }
+    }
+
+    
+    addEvent(document, "click", function(event) { 
+      if( event.target.nodeName === "A" ) {
+        #{js_logger("'bounce rate goal reached'")}
+        try {
+          var gwoPageTracker=_gat._getTracker("#{uacct}");
+          gwoPageTracker._trackPageview("/#{id}/goal");
+        }catch(err){}
+      }
+    });
+    #{js_logger("'set goal to bounce rate minimization'")}
+  //-->
+</script>
+JS
+      end
+
       src
     end
 

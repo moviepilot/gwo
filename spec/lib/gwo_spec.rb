@@ -142,6 +142,21 @@ describe GWO do
     end
   end
 
+  describe "goal is bounce rate" do
+    before(:each) do
+      stub!(:output_buffer=).and_return "foo"
+      stub!(:output_buffer).and_return "foo"
+    end
+
+    it "should create link bindings when goal is bounce rate" do
+      gwo_experiment("id", "uacct", sections = [:foo, :bar], :goal_is_bounce_rate => true).should =~ /addEventListener/
+    end
+
+    it "should not create link bindings when goal is not bounce rate" do
+      gwo_experiment("id", "uacct", sections = [:foo, :bar]).should_not =~ /addEventListener/
+    end
+  end
+
   describe "gwo_section method with named sections" do
     before(:each) do
       stub!(:output_buffer=).and_return "foo"
