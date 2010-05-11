@@ -26,7 +26,7 @@ module GWO
     #     * <b>:goal_is_bounce_rate</b> if true, every click on a link on the current view is counted as a goal (NOTE: this includes external links as well)
     def gwo_experiment(id, uacct, sections = [], options = {}, &block)
       options = {
-        :conditions => true,
+        :conditions => (ENV['RAILS_ENV'] == 'test' ? false : true),
         :goal_is_bounce_rate => false
       }.update(options)
 
@@ -75,7 +75,7 @@ JS
     #   * :conditions as in gwo_experiment
     def gwo_conversion(id, uacct, options = {})  
       options = {
-        :conditions => true
+        :conditions => (ENV['RAILS_ENV'] == 'test' ? false : true)
       }.update(options)
 
       return js_logger("skipping conversion snippet: a/b variation test switched off", true) if options[:conditions] == false
@@ -105,7 +105,7 @@ JS
     #   * :conditions as in gwo_experiment
     def gwo_section(section = "gwo_section", variation_ids = nil, options = {}, &block)
       options = {
-        :conditions => true
+        :conditions => (ENV['RAILS_ENV'] == 'test' ? false : true)
       }.update(options)
 
       variation_ids = [*variation_ids].compact

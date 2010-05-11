@@ -228,4 +228,38 @@ describe GWO do
     end
   end
   
+  describe "gwo_methods in rails testing environment" do
+    before(:all) do
+      @stored_rails_env = ENV['RAILS_ENV']
+      ENV['RAILS_ENV'] = 'test'
+    end
+    
+    after(:all) do
+      @stored_rails_env.nil? ? ENV.delete('RAILS_ENV') : ENV['RAILS_ENV'] = @stored_rails_env
+    end
+    
+    before(:each) do
+      stub!(:output_buffer=).and_return "foo"
+      stub!(:output_buffer).and_return "foo"
+    end
+    
+    it "should not render javascript (:gwo_experiment)" do
+      result = gwo_experiment("id", "uacct", sections = [:foo, :bar])
+      result.should == ''
+      result.should_not =~ /<script type="text\/javascript">/
+    end
+
+    it "should not render javascript (:gwo_experiment)" do
+      result = gwo_conversion("gwo_id", "gwo_uacct")
+      result.should == ''
+      result.should_not =~ /<script type="text\/javascript">/
+    end
+    
+    it "should not render javascript (:gwo_section)" do
+      result = gwo_section("gwo_section", [1, 2])
+      result.should == ''
+      result.should_not =~ /<script>/
+    end
+  end
+  
 end
