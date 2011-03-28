@@ -20,7 +20,7 @@ This is a Ruby on Rails plugin (gem) which simplifies Server-Side Dynamic Sectio
 
 The 'Usage' may look long - but it's fairly straightforward and shouldn't take 5 mins.
 
-Daniel Bornkessel gwo@bornkessel.com & Alex MacCaw - alex@madebymany.co.uk (original author)
+Daniel Bornkessel gwo@moviepilot.com & Alex MacCaw - alex@madebymany.co.uk (original author)
 
 == Usage
 --------
@@ -116,12 +116,12 @@ To use GWO, you need two pages:
 ------------------
 ... haml:
 
-    = gwo_conversion('UA-23902382-1', '1909920434')
+    = gwo_conversion('1909920434', 'UA-23902382-1')
 
 ... erb:
 
-    <%= gwo_conversion('UA-23902382-1', '1909920434') %>
+    <%= gwo_conversion('1909920434', 'UA-23902382-1') %>
 
 
 
-Copyright (c) 2009 Made by Many, released under the MIT license
+Copyright (c) 2009 Made by Many, Moviepilot, released under the MIT license
